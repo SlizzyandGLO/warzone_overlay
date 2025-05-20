@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Warzone SR Overlay (Dynamic)</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: rgba(0, 0, 0, 0);
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .overlay {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(10, 10, 10, 0.75);
+      border: 2px solid #00BFFF;
+      border-radius: 12px;
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      gap: 24px;
+    }
+
+    .rank-icon img {
+      height: 42px;
+      width: auto;
+    }
+
+    .sr {
+      color: #00FFFF;
+    }
+
+    .session {
+      font-weight: bold;
+    }
+
+    .positive {
+      color: #00FF00;
+    }
+
+    .negative {
+      color: #FF4C4C;
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay">
+    <div class="rank-icon">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAACNUlEQVR4Xu3bQQ6DMAwF0HH//1u0xjFgrIzgAgQ9IxygeGyZ7c6k4EpEGZnNVlXV1dXVeAABZ3d3dr60wRQBBjUYwxWMMVjDFYwxWMMVjDFYwxWMMVjDFYwxWMMVjDFYwxWMMVjDFYwxWMMVjDFYwxWMMVjDFYwxWMMVjDFYwxWP8RQK3cXKP8DxkSAIEuIgcQkQCIkQkAiJEJAIiRCQCIkQkAiJEJAIiRCQCIkQkAiJEJAIiRCQCIkQkAiJEJAIiRCQCIkQkAiJEJAIiRCQCIkQkAiJEJAOivDKvgff38AAAAASUVORK5CYII=" alt="Diamond I" />
+    </div>
+    <div class="sr">SR: <span id="current-sr">Loading...</span></div>
+    <div class="session" id="session-sr">Session: Loading...</div>
+  </div>
+
+  <script>
+    async function loadSR() {
+      try {
+        const [srRes, sessionRes] = await Promise.all([
+          fetch("current_sr.txt"),
+          fetch("session_sr.txt")
+        ]);
+
+        const sr = await srRes.text();
+        const session = await sessionRes.text();
+
+        document.getElementById("current-sr").textContent = sr.trim();
+
+        const sessionEl = document.getElementById("session-sr");
+        sessionEl.textContent = `Session: ${session.trim()}`;
+        sessionEl.className = "session " + (session.trim().startsWith('-') ? "negative" : "positive");
+      } catch (error) {
+        console.error("Error loading SR data:", error);
+      }
+    }
+
+    loadSR();
+    setInterval(loadSR, 5000);
+  </script>
+</body>
+</html>
